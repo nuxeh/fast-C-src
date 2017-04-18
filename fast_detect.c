@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include <stdlib.c>
+#include <stdlib.h>
+#include <string.h>
 
 #include "fast.h"
 
@@ -30,6 +31,17 @@ void pgm_write(const char *filename,int width,int height,unsigned char *buf)
         fwrite(buf,width,height,f);
         fclose(f);   
     }
+}
+
+void draw_blob(unsigned char *img, int cx, int cy, int w, int h)
+{
+	int x, y;
+	for (x = cx - 4; x < cx + 4; x++) if (x > 0 && x < w) {
+		for (y = cy - 4; y < cy + 4; y++) if (y > 0 && y < h)
+		{
+			img[x + y * w] = 255;
+		}
+	}
 }
 
 int main(int argc, char *argv[])
@@ -75,26 +87,18 @@ int main(int argc, char *argv[])
 		goto out_d;
 	}
 
+	printf("found %d corners\n", nc);
+
 	/* annotate output image */
 	out = malloc(w * h);
 	memcpy(out, data, w * h);
 
 	/* draw a cross on each corner */
 	while (nc-- > 0)
-	{
-		for (cx = c[nc].x - CW/2; c < c[nc].x + CW/2; cx++) {
-			for (cy = c[nc].y - CW/2; c < c[nc].y + CW/2; cy++)
-			{
-				ci = cx + cy * w;
-				
+		draw_blob(out, c[nc].x, c[nc].y, w, h);
 
-			}
-		}
-		
-	}
-
-	if (argc > 3)
-		out_path = argv[3]
+	if (argc > 4)
+		out_path = argv[4];
 	else
 		out_path = "/tmp/fast.pgm";
 
